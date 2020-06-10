@@ -1,3 +1,4 @@
+from plyer import notification
 from selenium import webdriver
 from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver.common.by import By
@@ -170,6 +171,17 @@ if __name__ == "__main__":
         print("some favourite products are in stock!")
         print(tabulate(favourites_in_stock, headers="keys", tablefmt="pretty"))
 
+    for f in favourites_in_stock:
+        notification.notify(
+            "Casper",
+            "Casper %s %s %s %s is back in stock! Price - %s" % (
+                f["product"],
+                f["type"],
+                f["title"],
+                f["colour"],
+                f["discount_price"],
+            )
+        )
     pass
 
 
