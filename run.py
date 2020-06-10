@@ -184,7 +184,9 @@ if __name__ == "__main__":
                 f["title"],
                 f["colour"],
                 f["discount_price"],
-            )
+            ),
+            app_name="Casper Stock Checker",
+            app_icon="./favicon.ico"
         )
     pass
 
