@@ -80,3 +80,7 @@ bedding:
 | mattress-protector |        Super King         |      super-king       |              |             | Out of Stock |      n/a       |     False      |
 +--------------------+---------------------------+-----------------------+--------------+-------------+--------------+----------------+----------------+
 ```
+
+### Notification
+
+![Example notification](notification.png)
