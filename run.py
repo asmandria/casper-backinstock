@@ -1,6 +1,7 @@
 from plyer import notification
 from selenium import webdriver
 from selenium.common.exceptions import NoSuchElementException
+from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as ec
 from selenium.webdriver.support.ui import WebDriverWait
@@ -9,7 +10,10 @@ import time
 
 CASPER_URL_BASE = "https://casper.com/uk/en"
 
-driver = webdriver.Chrome(executable_path="./chromedriver.exe")
+opt = Options()
+opt.add_argument("--headless")
+
+driver = webdriver.Chrome(executable_path="./chromedriver.exe", options=opt)
 
 favourite_products = [
     {"product": "sheets", "type": "pillowcase", "size": "standard"},
