@@ -11,7 +11,10 @@ CASPER_URL_BASE = "https://casper.com/uk/en"
 driver = webdriver.Chrome(executable_path="./chromedriver.exe")
 
 favourite_products = [
-
+    {"product": "sheets", "type": "pillowcase", "size": "standard"},
+    {"product": "sheets", "type": "fitted-sheet", "size": "single"},
+    {"product": "casper", "size": "double"},
+    {"product": "casper", "size": "uk-king"}
 ]
 
 categories = {
@@ -23,15 +26,15 @@ categories = {
     "pillow": {
         "pillow": "https://casper.com/uk/en/pillows/"
     },
-    "bedframes": {
-        "platform-bed": "https://casper.com/uk/en/platform-bed/",
-        "electric-adjustable-beds": "https://casper.com/uk/en/electric-adjustable-beds/",
-        "upholstered-bedframe": "https://casper.com/uk/en/upholstered-bedframe/"
-    },
     "bedding": {
         "sheets": "https://casper.com/uk/en/sheets/",
         "duvet": "https://casper.com/uk/en/duvet/",
         "mattress-protector": "https://casper.com/uk/en/mattress-protector/"
+    },
+    "bedframes": {
+        "platform-bed": "https://casper.com/uk/en/platform-bed/",
+        "electric-adjustable-beds": "https://casper.com/uk/en/electric-adjustable-beds/",
+        "upholstered-bedframe": "https://casper.com/uk/en/upholstered-bedframe/"
     },
     "accessories": {
         "glowlight": "https://casper.com/uk/en/glow-light/buy/",
@@ -43,7 +46,6 @@ categories = {
 products = {}
 
 
-# seems to work without this
 def dismiss_cookies():
     # load the homepage
     print("loading homepage...")
@@ -90,6 +92,15 @@ def get_variant(product, colour=None, _type=None):
             products[category].append(p)
         except KeyError:
             products[category] = [p]
+
+
+def find_products(criteria):
+    all_products = [a for x, y in products.items() for a in y]
+    return [
+        x for x in all_products if all(
+            x[k] == v for k, v in criteria.items()
+        )
+    ]
 
 
 def get_colours(product, _type=None):
@@ -147,3 +158,18 @@ if __name__ == "__main__":
         print(tabulate(product_range, headers="keys", tablefmt="pretty"))
 
     driver.quit()
+
+    favourites_in_stock = [
+        product
+        for favourite in favourite_products
+        for product in find_products(favourite)
+        if product["naive_in_stock"] or product["price"] != "Out of Stock"
+    ]
+
+    if len(favourites_in_stock) > 0:
+        print("some favourite products are in stock!")
+        print(tabulate(favourites_in_stock, headers="keys", tablefmt="pretty"))
+
+    pass
+
+
