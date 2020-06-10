@@ -92,7 +92,7 @@ def get_variant(product, colour=None, _type=None):
             "discount_price": ("£%.2f" % (float(price[1:].replace(',', '')) * 0.4)) if "£" in price else "n/a",
             "naive_in_stock": naive_in_stock,
         }
-        print(" ".join([x if type(x) is str else "" for x in p.values()]))
+        # print(" ".join([x if type(x) is str else "" for x in p.values()]))
         try:
             products[category].append(p)
         except KeyError:
