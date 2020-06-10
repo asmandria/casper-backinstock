@@ -12,14 +12,23 @@ CASPER_URL_BASE = "https://casper.com/uk/en"
 
 opt = Options()
 opt.add_argument("--headless")
+opt.add_argument("--log-level=3")
 
 driver = webdriver.Chrome(executable_path="./chromedriver.exe", options=opt)
 
 favourite_products = [
-    {"product": "sheets", "type": "pillowcase", "size": "standard"},
-    {"product": "sheets", "type": "fitted-sheet", "size": "single"},
-    {"product": "casper", "size": "double"},
-    {"product": "casper", "size": "uk-king"}
+    {"product": "sheets", "type": "pillowcase"},
+    {"product": "sheets", "type": "fitted-sheet", "size": "double"},
+    {"product": "sheets", "type": "fitted-sheet", "size": "king"},
+    {"product": "sheets", "type": "duvet-cover", "size": "double-200-x-200-cm"},
+    {"product": "sheets", "type": "duvet-cover", "size": "king-225-x-220-cm"},
+    {"product": "casper"},
+    {"product": "nightstand"},
+    {"product": "casper-essential"},
+    {"product": "hybrid-mattress"},
+    {"product": "glowlight"},
+    {"product": "casper", "size": "uk-king"},
+    {"product": "duvet"}
 ]
 
 categories = {
@@ -178,16 +187,19 @@ if __name__ == "__main__":
     for f in favourites_in_stock:
         notification.notify(
             "Casper",
-            "Casper %s %s %s %s is back in stock! Price - %s" % (
-                f["product"],
-                f["type"],
-                f["title"],
-                f["colour"],
-                f["discount_price"],
-            ),
+            "Casper %s is back in stock! Price - %s" % (
+                " ".join(x for x in [
+                    f["product"],
+                    f["type"],
+                    f["title"],
+                    f["colour"]
+                ] if x is not None),
+                f["discount_price"]),
             app_name="Casper Stock Checker",
             app_icon="./favicon.ico"
         )
-    pass
+
+    # keep notification open for a bit
+    time.sleep(60)
 
 
