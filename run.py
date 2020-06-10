@@ -1,4 +1,5 @@
 from selenium import webdriver
+from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as ec
 from selenium.webdriver.support.ui import WebDriverWait
@@ -45,6 +46,7 @@ products = {}
 # seems to work without this
 def dismiss_cookies():
     # load the homepage
+    print("loading homepage...")
     driver.get(CASPER_URL_BASE)
 
     # dismiss cookie dialog
@@ -53,44 +55,95 @@ def dismiss_cookies():
             (By.XPATH, '//iframe[@title="TrustArc Cookie Consent Manager"]')
         )
     )
+    print("waiting for cookie dialog...")
     WebDriverWait(driver, 10).until(
         ec.element_to_be_clickable(
             (By.XPATH, "//a[@class='call'][text()='Agree and Proceed']")
         )
     ).click()
+    print("clicked accept cookies")
+    time.sleep(0.5)
+
+
+def get_variant(product, colour=None, _type=None):
+    variants = driver.find_element_by_xpath(
+        "//select[@id='input-selectedProductVariant']"
+    ).find_elements_by_tag_name("option")
+    for variant in variants:
+        segments = [x.strip() for x in variant.text.split('-')]
+        friendly_name = segments[0]
+        price = segments[1]
+        size = variant.get_attribute("value")
+        naive_in_stock = variant.is_enabled()
+        p = {
+            "product": product,
+            "title": friendly_name,
+            "size": size,
+            "type": _type,
+            "colour": colour,
+            "price": price,  # will also say "out of stock"
+            "discount_price": ("£%.2f" % (float(price[1:].replace(',', '')) * 0.4)) if "£" in price else "n/a",
+            "naive_in_stock": naive_in_stock,
+        }
+        print(" ".join([x if type(x) is str else "" for x in p.values()]))
+        try:
+            products[category].append(p)
+        except KeyError:
+            products[category] = [p]
+
+
+def get_colours(product, _type=None):
+    try:
+        colours = driver.find_element_by_xpath(
+            "//div[@data-qa='color-swatches']"
+        ).find_elements_by_tag_name("button")
+        for colour in colours:
+            c = colour.get_attribute("aria-label")
+            colour.click()
+            time.sleep(2)
+            print("colour: %s" % c)
+            # <button aria-label="White/White" .../>
+            get_variant(product, colour=c, _type=_type)
+    except NoSuchElementException:
+        get_variant(product)
 
 
 if __name__ == "__main__":
     dismiss_cookies()
 
     for category, ranges in categories.items():
-        for product, url in ranges.items():
-            print("loading %s" % product)
-            xpath = "//select[@id='input-selectedProductVariant']"
+        for product_range, url in ranges.items():
+            print("loading %s" % product_range)
             driver.get(url)
-            select = driver.find_element_by_xpath(xpath)
-            variants = select.find_elements_by_tag_name("option")
-            for variant in variants:
-                segments = [x.strip() for x in variant.text.split('-')]
-                friendly_name = segments[0]
-                price = segments[1]
+            try:
+                types = driver.find_element_by_xpath(
+                    "//select[@id='input-selectedProductType']"
+                )
+                for t in types.find_elements_by_tag_name("option"):
+                    # the site uses annoying <span> and <li> tags so you can't just click the option directly
+                    WebDriverWait(driver, 10).until(
+                        ec.element_to_be_clickable(
+                            (By.XPATH, "//span[contains(@class, 'SelectInputValueLabel')]")
+                        )
+                    ).click()
 
-                name = variant.get_attribute("value")
-                naive_in_stock = variant.is_enabled()
-                print("%s %s %s %s %s" % (product, friendly_name, name, naive_in_stock, price))
-                p = {
-                    "product": product,
-                    "title": friendly_name,
-                    "variant": name,
-                    "price": price,  # will also say "out of stock"
-                    "discount_price": float(price[1:].replace(',', '')) * 0.4 if "£" in price else "n/a",  # will also say "out of stock"
-                    "naive_in_stock": naive_in_stock,
-                }
-                try:
-                    products[category].append(p)
-                except KeyError:
-                    products[category] = [p]
+                    # wait for the animation
+                    time.sleep(1)
 
-    for category, product in products.items():
+                    WebDriverWait(driver, 10).until(
+                        ec.element_to_be_clickable(
+                            (By.XPATH, f"//li[contains(@class, 'InputDropdownListItem')][text()='{t.text}']")
+                        )
+                    ).click()
+                    print("type: %s" % t.get_attribute("value"))
+                    # wait for ajax or whatever
+                    time.sleep(2)
+                    get_colours(product_range, _type=t.get_attribute("value"))
+            except NoSuchElementException:
+                get_colours(product_range)
+
+    for category, product_range in products.items():
         print("%s:" % category)
-        print(tabulate(product, headers="keys", tablefmt="pretty"))
+        print(tabulate(product_range, headers="keys", tablefmt="pretty"))
+
+    driver.quit()
