@@ -3,10 +3,9 @@ Noooo, [Casper UK](https://casper.com/uk/en) are going out of business! 😢
 
 What's that? ***60%*** off ***EVERYTHING?!*** Awesome!
 
-Oh, it's all out of stock.
+[Oh, it's all out of stock.](https://casper.com/uk/en/inspiration/faqs/)
 
->https://casper.com/uk/en/inspiration/faqs/
-> ######2. Will Casper restock any products that are currently sold out?
+> ##### 2. Will Casper restock any products that are currently sold out?
 > We will not be restocking Casper products marked as “sold out.” For Casper products listed as “out of stock,” please continue to check our website for updates as we will be restocking in limited quantities this month only. If a product is not listed on our site, it is no longer available.
 
 Well screw that, I want some damn sheets!
