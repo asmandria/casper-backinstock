@@ -23,7 +23,7 @@ favourite_products = [
     {"product": "sheets", "type": "duvet-cover", "size": "double-200-x-200-cm"},
     {"product": "sheets", "type": "duvet-cover", "size": "king-225-x-220-cm"},
     {"product": "casper"},
-    {"product": "nightstand"},
+    {"product": "pillow"},
     {"product": "casper-essential"},
     {"product": "hybrid-mattress"},
     {"product": "glowlight"},
@@ -31,7 +31,7 @@ favourite_products = [
     {"product": "duvet"}
 ]
 
-categories = {
+products = {
     "mattresses": {
         "hybrid-mattress": "https://casper.com/uk/en/mattresses/hybrid-mattress/",
         "casper": "https://casper.com/uk/en/mattresses/casper/",
@@ -57,7 +57,9 @@ categories = {
     }
 }
 
-products = {}
+products_by_range = {}
+
+all_products = []
 
 
 def dismiss_cookies():
@@ -103,13 +105,12 @@ def get_variant(product, colour=None, _type=None):
         }
         # print(" ".join([x if type(x) is str else "" for x in p.values()]))
         try:
-            products[category].append(p)
+            products_by_range[category].append(p)
         except KeyError:
-            products[category] = [p]
+            products_by_range[category] = [p]
 
 
 def find_products(criteria):
-    all_products = [a for x, y in products.items() for a in y]
     return [
         x for x in all_products if all(
             x[k] == v for k, v in criteria.items()
@@ -136,7 +137,7 @@ def get_colours(product, _type=None):
 if __name__ == "__main__":
     dismiss_cookies()
 
-    for category, ranges in categories.items():
+    for category, ranges in products.items():
         for product_range, url in ranges.items():
             print("loading %s" % product_range)
             driver.get(url)
@@ -167,11 +168,13 @@ if __name__ == "__main__":
             except NoSuchElementException:
                 get_colours(product_range)
 
-    for category, product_range in products.items():
+    driver.quit()
+
+    for category, product_range in products_by_range.items():
+        for p in product_range:
+            all_products.append(p)
         print("%s:" % category)
         print(tabulate(product_range, headers="keys", tablefmt="pretty"))
-
-    driver.quit()
 
     favourites_in_stock = [
         product
@@ -180,9 +183,32 @@ if __name__ == "__main__":
         if product["naive_in_stock"] or product["price"] != "Out of Stock"
     ]
 
+    products_left_in_stock = []
+    products_sold_out = []
+
+    # might as well use a single loop here rather than a listcomp
+    for product in all_products:
+        if product["naive_in_stock"] or product["price"] != "Out of Stock":
+            products_left_in_stock.append(product)
+
+        # doesn't look like anything has been marked as actually sold out yet, so need to keep an eye on this
+        elif product["price"].lower() == "sold out":
+            products_sold_out.append(product)
+
+    if len(products_left_in_stock) > 0:
+        print(tabulate(products_left_in_stock, headers="keys", tablefmt="pretty"))
+    else:
+        print("it's all gone!!!")
+
     if len(favourites_in_stock) > 0:
         print("some favourite products are in stock!")
         print(tabulate(favourites_in_stock, headers="keys", tablefmt="pretty"))
+    else:
+        print("all favourite products out of stock")
+
+    if len(products_sold_out) > 0:
+        print("it's going!")
+        print(tabulate(products_sold_out, headers="keys", tablefmt="pretty"))
 
     for f in favourites_in_stock:
         notification.notify(
