@@ -9,6 +9,7 @@ from tabulate import tabulate
 import time
 
 CASPER_URL_BASE = "https://casper.com/uk/en"
+SHOW_ME_ALL_THE_DATA = False
 
 opt = Options()
 opt.add_argument("--headless")
@@ -173,8 +174,10 @@ if __name__ == "__main__":
     for category, product_range in products_by_range.items():
         for p in product_range:
             all_products.append(p)
-        print("%s:" % category)
-        print(tabulate(product_range, headers="keys", tablefmt="pretty"))
+
+        if SHOW_ME_ALL_THE_DATA:
+            print("%s:" % category)
+            print(tabulate(product_range, headers="keys", tablefmt="pretty"))
 
     favourites_in_stock = [
         product
@@ -196,9 +199,12 @@ if __name__ == "__main__":
             products_sold_out.append(product)
 
     if len(products_left_in_stock) > 0:
+        print("here's what's left")
         print(tabulate(products_left_in_stock, headers="keys", tablefmt="pretty"))
     else:
         print("it's all gone!!!")
+        print("(maybe you want to check the data? rerun with SHOW_ME_ALL_THE_DATA = True)")
+        exit()
 
     if len(favourites_in_stock) > 0:
         print("some favourite products are in stock!")
