@@ -11,8 +11,9 @@ What's that? ***60%*** off ***EVERYTHING?!*** Awesome!
 Well screw that, I want some damn sheets!
 
 ### Setup: 
+Requires Google Chrome / Chromium and [ChromeDriver](https://chromedriver.chromium.org/downloads).
 ```
-python3 -m venv venv
+python -m venv venv
 venv/Scripts/activate.bat
 pip install -r requirements.txt
 ```
