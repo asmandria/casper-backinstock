@@ -3,6 +3,8 @@ Noooo, [Casper UK](https://casper.com/uk/en) are going out of business! 😢
 
 What's that? ***60%*** off ***EVERYTHING?!*** Awesome!
 
+Update 15/06 - ***70%!!!***
+
 [Oh, it's all out of stock.](https://casper.com/uk/en/inspiration/faqs/)
 
 > ##### 2. Will Casper restock any products that are currently sold out?

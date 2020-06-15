@@ -101,7 +101,7 @@ def get_variant(product, colour=None, _type=None):
             "type": _type,
             "colour": colour,
             "price": price,  # will also say "out of stock"
-            "discount_price": ("£%.2f" % (float(price[1:].replace(',', '')) * 0.4)) if "£" in price else "n/a",
+            "discount_price": ("£%.2f" % (float(price[1:].replace(',', '')) * 0.3)) if "£" in price else "n/a",
             "naive_in_stock": naive_in_stock,
         }
         # print(" ".join([x if type(x) is str else "" for x in p.values()]))
