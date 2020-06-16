@@ -142,6 +142,9 @@ if __name__ == "__main__":
         for product_range, url in ranges.items():
             print("loading %s" % product_range)
             driver.get(url)
+            if driver.current_url != url:
+                print("range %s redirected - sold out?" % product_range)
+                continue
             try:
                 types = driver.find_element_by_xpath(
                     "//select[@id='input-selectedProductType']"
