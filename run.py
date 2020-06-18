@@ -194,7 +194,7 @@ if __name__ == "__main__":
 
     # might as well use a single loop here rather than a listcomp
     for product in all_products:
-        if product["naive_in_stock"] or product["price"] != "Out of Stock":
+        if product["price"] != "Out of Stock":
             products_left_in_stock.append(product)
 
         # doesn't look like anything has been marked as actually sold out yet, so need to keep an eye on this
