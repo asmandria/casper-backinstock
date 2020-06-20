@@ -9,7 +9,7 @@ from tabulate import tabulate
 import time
 
 CASPER_URL_BASE = "https://casper.com/uk/en"
-SHOW_ME_ALL_THE_DATA = False
+SHOW_ME_ALL_THE_DATA = True
 
 opt = Options()
 opt.add_argument("--headless")
@@ -111,9 +111,9 @@ def get_variant(product, colour=None, _type=None):
             products_by_range[category] = [p]
 
 
-def find_products(criteria):
+def find_products(criteria, selection):
     return [
-        x for x in all_products if all(
+        x for x in selection if all(
             x[k] == v for k, v in criteria.items()
         )
     ]
@@ -182,13 +182,6 @@ if __name__ == "__main__":
             print("%s:" % category)
             print(tabulate(product_range, headers="keys", tablefmt="pretty"))
 
-    favourites_in_stock = [
-        product
-        for favourite in favourite_products
-        for product in find_products(favourite)
-        if product["naive_in_stock"] or product["price"] != "Out of Stock"
-    ]
-
     products_left_in_stock = []
     products_sold_out = []
 
@@ -200,6 +193,12 @@ if __name__ == "__main__":
         # doesn't look like anything has been marked as actually sold out yet, so need to keep an eye on this
         elif product["price"].lower() == "sold out":
             products_sold_out.append(product)
+
+    favourites_in_stock = [
+        product
+        for favourite in favourite_products
+        for product in find_products(favourite, products_left_in_stock)
+    ]
 
     if len(products_left_in_stock) > 0:
         print("here's what's left")
